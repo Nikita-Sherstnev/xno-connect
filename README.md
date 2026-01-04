@@ -4,6 +4,10 @@ This library provides an interface to the Nano network through RPC and WebSocket
 
 **The library is in active development and not yet fully functional and tested.**
 
+## Usage
+
+See examples.
+
 ## Feature Flags
 
 **default**: RPC and WebSocket support, usable on backend side of application. Uses reqwest and tokio runtime.

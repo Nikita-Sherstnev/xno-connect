@@ -55,7 +55,7 @@ wasm-full = ["wasm-rpc", "wasm-websocket"]
 full = ["std", "rpc", "websocket-tls", "work-cpu"]
 
 [dev-dependencies]
-tokio = { version = "1.48.0", features = ["rt", "macros"] }
+tokio = { version = "1.48.0", features = ["rt", "rt-multi-thread", "macros"] }
 dotenvy = "0.15"
 
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
