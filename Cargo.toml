@@ -1,0 +1,69 @@
+[package]
+name = "xno-connect"
+version = "0.1.0"
+edition = "2021"
+authors = ["XNO-connect contributors"]
+description = "A Rust library for Nano cryptocurrency node communication via RPC and WebSocket APIs with WASM support"
+license = "MIT"
+repository = "https://github.com/Nikita-Sherstnev/xno-connect"
+keywords = ["nano", "xno", "cryptocurrency", "blockchain", "rpc", "websocket", "wasm"]
+categories = ["cryptography::cryptocurrencies", "api-bindings"]
+rust-version = "1.75"
+
+[dependencies]
+ed25519-dalek = { version = "2.2.0", default-features = false, features = ["alloc"] }
+curve25519-dalek-ng = { version = "4.1.1", default-features = false, features = ["alloc", "u64_backend"] }
+blake2 = { version = "0.10", default-features = false }
+serde = { version = "1", default-features = false, features = ["derive", "alloc"] }
+serde_json = { version = "1", default-features = false, features = ["alloc"] }
+hex = { version = "0.4", default-features = false, features = ["alloc"] }
+zeroize = { version = "1", default-features = false, features = ["derive"] }
+subtle = { version = "2", default-features = false }
+getrandom = { version = "0.2", default-features = false }
+reqwest = { version = "0.12", optional = true, default-features = false, features = ["json"] }
+tokio-tungstenite-wasm = { version = "0.8", optional = true }
+futures-util = { version = "0.3", optional = true, default-features = false, features = ["sink"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+reqwest = { version = "0.12", optional = true, features = ["rustls-tls"] }
+rayon = { version = "1", optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = { version = "0.2", optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
+futures-channel = { version = "0.3", optional = true }
+web-sys = { version = "0.3", optional = true, features = [
+    "Crypto",
+    "console",
+] }
+js-sys = { version = "0.3", optional = true }
+getrandom = { version = "0.2", features = ["js"] }
+
+[features]
+default = ["std", "rpc", "websocket"]
+std = ["serde/std", "serde_json/std", "hex/std", "blake2/std", "getrandom/std", "ed25519-dalek/std"]
+
+rpc = ["std", "reqwest"]
+websocket = ["std", "tokio-tungstenite-wasm", "futures-util"]
+websocket-tls = ["websocket", "tokio-tungstenite-wasm/native-tls"]
+work-cpu = ["std", "rayon"]
+
+wasm-rpc = ["wasm-bindgen", "wasm-bindgen-futures", "web-sys", "js-sys", "reqwest"]
+wasm-websocket = ["wasm-bindgen", "wasm-bindgen-futures", "futures-channel", "web-sys", "js-sys", "tokio-tungstenite-wasm", "futures-util"]
+wasm-full = ["wasm-rpc", "wasm-websocket"]
+
+full = ["std", "rpc", "websocket-tls", "work-cpu"]
+
+[dev-dependencies]
+tokio = { version = "1.48.0", features = ["rt", "macros"] }
+dotenvy = "0.15"
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+lto = true
+codegen-units = 1
